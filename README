@@ -1,0 +1,33 @@
+Todos:
+1. Multiple rules with same port get overwritten. Need to fix that
+2. Try to look for edge cases and handle them
+3. Performance testing against large number of inputs and larger rule set
+
+Testing:
+The code was tested by -
+1. Checking if the rules have been correctly loaded and the ranges of IP and ports are correctly included. Found Todo #1 during this
+2. tweaking the values in fw.accept_packet for edge cases
+
+Design decisions:
+The rules are stored in following format:
+{
+    "direction": {
+        "protocol": {
+            "port": {
+                "octet 1": {
+                    "octet 2": {
+                        "octet 3": [
+                            "octet 4 range"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
+
+Following tradeoffs were made during the design:
+1. Use of a hash/dictionary to store rules so that look up is done in constant amount of time. Also, any updates to the rules would be easily done.
+2. The choice of keys within the hash also played an important role. The tradeoff here is reuse some of the keys so that reuse as many keys as possible.
+However, keeping fast lookup in mind, the design allowed repetition of IPs per port.
+3. This design choice also allows the users to specify fine grained rules at the expense of storage.
